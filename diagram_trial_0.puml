@@ -1,0 +1,337 @@
+@startuml
+namespace apiserver {
+    class Config << (S,Aquamarine) >> {
+        + BindAddr string
+        + LogLevel string
+
+    }
+    class server << (S,Aquamarine) >> {
+        - router *mux.Router
+        - logger *logrus.Logger
+        - store store.Store
+
+        - configureRouter() 
+        - handleUsersCreate() http.HandlerFunc
+        - handleLike() http.HandlerFunc
+        - handleGetLiked() http.HandlerFunc
+        - handleGetBooked() http.HandlerFunc
+        - handleSearch() http.HandlerFunc
+        - handleStartBookingProperty() http.HandlerFunc
+        - handleBooking() http.HandlerFunc
+        - handleCancelBooking() http.HandlerFunc
+        - handleHotelsCreate() http.HandlerFunc
+        - handleCleanHotels() http.HandlerFunc
+        - handleCleanProperties() http.HandlerFunc
+        - handlePropertiesCreate() http.HandlerFunc
+        - handleSessionsCreate() http.HandlerFunc
+        - error(w http.ResponseWriter, r *http.Request, code int, err error) 
+        - respond(w http.ResponseWriter, r *http.Request, code int, data <font color=blue>interface</font>{}) 
+
+        + ServeHTTP(w http.ResponseWriter, r *http.Request) 
+
+    }
+}
+
+
+namespace model {
+    class Address << (S,Aquamarine) >> {
+        + Line1 string
+        + Line2 string
+        + City string
+        + State string
+        + PostalCode string
+        + Country string
+
+    }
+    class Booking << (S,Aquamarine) >> {
+        + BookingKey string
+        + Sha1 string
+        + Email string
+        + Phone string
+        + Name string
+        + Surname string
+        + CreditCard *CreditCard
+        + PaymentID string
+        + Status string
+        + Timestamp string
+        + PropertyInternalID string
+
+    }
+    class CreditCard << (S,Aquamarine) >> {
+        + CardNumber string
+        + ExpDate string
+        + CSV string
+        + Owner string
+
+    }
+    class Filter << (S,Aquamarine) >> {
+        + Country string
+        + City string
+        + StructureType string
+        + PriceFrom string
+        + PriceTo string
+        + Currency string
+        + Stars string
+        + Datefrom string
+        + Dateto string
+        + Wifi string
+        + Breakfast string
+        + Parking string
+        + Pool string
+        + Playground string
+        + Garden string
+        + RoomsNumber string
+        + BedsNumber string
+        + Capacity string
+        + OrderBy string
+        + Desc string
+
+    }
+    class Hotel << (S,Aquamarine) >> {
+        + HotelID string
+        + HotelInternalID string
+        + HotelName string
+        + Provider string
+        + StructureType string
+        + Stars int
+        + MinNights int
+        + MaxNights int
+        + StartDate string
+        + ActiveDayPeriod string
+        + Images []string
+        + Latitude string
+        + Longitude string
+        + Address *Address
+        + Description string
+        + Active bool
+        + Wifi bool
+        + Breakfast bool
+        + Parking bool
+        + Pool bool
+        + Playground bool
+        + Garden bool
+        + CheckIn string
+        + CheckOut string
+
+        + Validate() error
+
+    }
+    class Like << (S,Aquamarine) >> {
+        + Sha1 string
+        + HotelInternalID string
+
+    }
+    class Property << (S,Aquamarine) >> {
+        + HotelID string
+        + HotelInternalID string
+        + PropertyInternalID string
+        + Provider string
+        + PropertyID string
+        + PropertyName string
+        + Price float32
+        + Currency string
+        + Image string
+        + Description string
+        + Active bool
+        + RoomsNumber int
+        + BedsNumber int
+        + Capacity int
+        + SizeM float32
+        + DateTo string
+        + DateFrom string
+        + Nights int
+        + Lock string
+
+        + Validate() error
+
+    }
+    class Responce << (S,Aquamarine) >> {
+        + HotelID string
+        + HotelInternalID string
+        + HotelName string
+        + Provider string
+        + StructureType string
+        + Stars int
+        + DateTo string
+        + DateFrom string
+        + Images []string
+        + Latitude string
+        + Longitude string
+        + Address *Address
+        + Description string
+        + Active bool
+        + Wifi bool
+        + Breakfast bool
+        + Parking bool
+        + Pool bool
+        + Playground bool
+        + Garden bool
+        + CheckIn string
+        + CheckOut string
+        + MinPrice string
+        + Currency string
+        + Nights int
+        + Properties []*Property
+
+    }
+    class User << (S,Aquamarine) >> {
+        + ID int
+        + Sha1 string
+        + Email string
+        + Password string
+        + EncryptedPassword string
+
+        + Validate() error
+        + BeforeCreate() error
+        + Sanitize() 
+        + ComparePassword(password string) bool
+
+    }
+}
+
+
+namespace sqlstore {
+    class HistoryRepository << (S,Aquamarine) >> {
+        - store *Store
+
+        + StartBooking(b *model.Booking) error
+        + EndBooking(b *model.Booking) error
+        + CancelBooking(b *model.Booking) error
+        + GetBookings(sha1 string) ([]*model.Booking, error)
+        + Like(l *model.Like) error
+        + GetLikes(sha1 string) ([]*model.Like, error)
+
+    }
+    class HotelRepository << (S,Aquamarine) >> {
+        - store *Store
+
+        + CreateHotels(h *model.Hotel) error
+        + CreateProperty(p *model.Property) error
+        + Search(f *model.Filter) ([]*model.Responce, error)
+        + FindHotelByFilter(f *model.Filter) ([]*model.Hotel, error)
+        + FindPropertyByFilter(f *model.Filter, hotel *model.Hotel) ([]*model.Property, error)
+        + CleanHotels() error
+        + CleanProperties() error
+
+    }
+    class Store << (S,Aquamarine) >> {
+        - db *sql.DB
+        - userRepository *UserRepository
+        - hotelRepository *HotelRepository
+        - historyRepository *HistoryRepository
+
+        + User() store.UserRepository
+        + Hotel() store.HotelRepository
+        + Property() store.HotelRepository
+        + Responce() store.HotelRepository
+        + Booking() store.HistoryRepository
+        + Like() store.HistoryRepository
+
+    }
+    class UserRepository << (S,Aquamarine) >> {
+        - store *Store
+
+        + CreateUser(u *model.User) error
+        + FindUserByEmail(email string) (*model.User, error)
+
+    }
+}
+
+"store.HistoryRepository" <|-- "sqlstore.HistoryRepository"
+"store.HotelRepository" <|-- "sqlstore.HotelRepository"
+"store.Store" <|-- "sqlstore.Store"
+"store.UserRepository" <|-- "sqlstore.UserRepository"
+
+namespace store {
+    interface HistoryRepository  {
+        + StartBooking(b *model.Booking) error
+        + EndBooking(b *model.Booking) error
+        + CancelBooking( *model.Booking) error
+        + GetBookings(sha1 string) ([]*model.Booking, error)
+        + Like( *model.Like) error
+        + GetLikes(sha1 string) ([]*model.Like, error)
+
+    }
+    interface HotelRepository  {
+        + CreateHotels( *model.Hotel) error
+        + CreateProperty( *model.Property) error
+        + Search( *model.Filter) ([]*model.Responce, error)
+        + CleanHotels() error
+        + CleanProperties() error
+
+    }
+    interface Store  {
+        + User() UserRepository
+        + Hotel() HotelRepository
+        + Property() HotelRepository
+        + Responce() HotelRepository
+        + Booking() HistoryRepository
+        + Like() HistoryRepository
+
+    }
+    interface UserRepository  {
+        + CreateUser( *model.User) error
+        + FindUserByEmail( string) (*model.User, error)
+
+    }
+}
+
+
+namespace teststore {
+    class HistoryRepository << (S,Aquamarine) >> {
+        - store *Store
+        - bookings <font color=blue>map</font>[string]*model.Booking
+        - likes <font color=blue>map</font>[string]*model.Like
+
+        + StartBooking(b *model.Booking) error
+        + EndBooking(b *model.Booking) error
+        + CancelBooking(b *model.Booking) error
+        + GetBookings(sha1 string) ([]*model.Booking, error)
+        + Like(l *model.Like) error
+        + GetLikes(sha1 string) ([]*model.Like, error)
+
+    }
+    class HotelRepository << (S,Aquamarine) >> {
+        - store *Store
+        - hotels <font color=blue>map</font>[string]*model.Hotel
+        - properties <font color=blue>map</font>[string]*model.Property
+        - responces <font color=blue>map</font>[string]*model.Responce
+
+        + CreateHotels(h *model.Hotel) error
+        + CreateProperty(h *model.Property) error
+        + Search(filter *model.Filter) ([]*model.Responce, error)
+        + FindHotelByFilter(filter *model.Filter) ([]*model.Hotel, error)
+        + CleanHotels() error
+        + CleanProperties() error
+
+    }
+    class Store << (S,Aquamarine) >> {
+        - userRepository *UserRepository
+        - hotelRepository *HotelRepository
+        - historyRepository *HistoryRepository
+
+        + User() store.UserRepository
+        + Hotel() store.HotelRepository
+        + Property() store.HotelRepository
+        + Responce() store.HotelRepository
+        + Booking() store.HistoryRepository
+        + Like() store.HistoryRepository
+
+    }
+    class UserRepository << (S,Aquamarine) >> {
+        - store *Store
+        - users <font color=blue>map</font>[string]*model.User
+
+        + CreateUser(u *model.User) error
+        + WriteSha1(u *model.User) error
+        + FindUserByEmail(email string) (*model.User, error)
+
+    }
+}
+
+"store.HistoryRepository" <|-- "teststore.HistoryRepository"
+"store.HotelRepository" <|-- "teststore.HotelRepository"
+"store.Store" <|-- "teststore.Store"
+"store.UserRepository" <|-- "teststore.UserRepository"
+
+@enduml

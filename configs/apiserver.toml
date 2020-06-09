@@ -1,0 +1,4 @@
+bind_addr = ":8080"
+log_level = "info"
+# database_url = "postgres+pg8000://rita_test:12test34@/restapi_dev?unix_sock=/cloudsql/restapi_dev/.s.PGSQL.5432"
+database_url  = "host=localhost dbname=restapi_dev sslmode=disable"
