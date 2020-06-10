@@ -18,16 +18,20 @@ CREATE TABLE bookings
      NAME                 VARCHAR NOT NULL, 
      surname              VARCHAR NOT NULL, 
      payment_id           VARCHAR NOT NULL, 
-     status               VARCHAR NOT NULL,-- active / canceled 
+     status               VARCHAR NOT NULL, -- active / canceled 
      timestamp            VARCHAR NOT NULL, 
-     property_internal_id VARCHAR NOT NULL 
+     property_internal_id VARCHAR NOT NULL,
+     date_from            VARCHAR NOT NULL,
+     date_to              VARCHAR NOT NULL,
+     property_id          VARCHAR NOT NULL,
+     hotel_internal_id    VARCHAR NOT NULL
   ); 
 
 COMMIT; 
 
 CREATE TABLE likes 
   ( 
-     sha1              VARCHAR PRIMARY KEY, 
+     sha1              VARCHAR NOT NULL,
      hotel_internal_id VARCHAR NOT NULL 
   ); 
 

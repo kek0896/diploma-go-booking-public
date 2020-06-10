@@ -13,6 +13,8 @@ type Booking struct {
 	Status             string      `json:"status"`
 	Timestamp          string      `json:"timestamp"`
 	PropertyInternalID string      `json:"property_internal_id"`
-	// PropertyID         string      `json:"property_id"`
-	// HotelInternalID    string      `json:"hotel_internal_id"`
+	PropertyID         string      `json:"property_id"`
+	HotelInternalID    string      `json:"hotel_internal_id"`
+	DateFrom           string      `json:"date_from"`
+	DateTo             string      `json:"date_to"`
 }
