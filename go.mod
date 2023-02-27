@@ -7,10 +7,8 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gorilla/mux v1.7.4
-	github.com/jfeliu007/goplantuml v1.5.0 // indirect
 	github.com/lib/pq v1.5.2
 	github.com/sirupsen/logrus v1.6.0
-	github.com/spf13/afero v1.2.2 // indirect
 	github.com/stretchr/testify v1.5.1
-	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
+	golang.org/x/crypto v0.1.0
 )
